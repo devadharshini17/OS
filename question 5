@@ -1,0 +1,75 @@
+#include<stdio.h>
+#include<stdlib.h>
+
+typedef struct {
+    int pid;
+    int arrival_time;
+    int burst_time;
+    int remaining_time;
+    int waiting_time;
+    int turnaround_time;
+} process;
+
+void swap(process *p1, process *p2) {
+    process temp = *p1;
+    *p1 = *p2;
+    *p2 = temp;
+}
+
+int main() {
+    int n = 4;
+    process processes[n];
+    for (int i = 0; i < n; i++) {
+        processes[i].pid = i+1;
+        scanf("%d %d", &processes[i].arrival_time, &processes[i].burst_time);
+        processes[i].remaining_time = processes[i].burst_time;
+        processes[i].waiting_time = 0;
+        processes[i].turnaround_time = 0;
+    }
+
+    int current_time = 0, completed = 0, min_idx = 0;
+    float total_waiting_time = 0, total_turnaround_time = 0;
+    while (completed < n) {
+        int min_burst_time = 100000;
+        for (int i = 0; i < n; i++) {
+            if (processes[i].arrival_time <= current_time && processes[i].remaining_time < min_burst_time && processes[i].remaining_time > 0) {
+                min_burst_time = processes[i].remaining_time;
+                min_idx = i;
+            }
+        }
+        processes[min_idx].remaining_time--;
+        current_time++;
+        if (processes[min_idx].remaining_time == 0) {
+            completed++;
+            processes[min_idx].turnaround_time = current_time - processes[min_idx].arrival_time;
+            processes[min_idx].waiting_time = processes[min_idx].turnaround_time - processes[min_idx].burst_time;
+            total_waiting_time += processes[min_idx].waiting_time;
+            total_turnaround_time += processes[min_idx].turnaround_time;
+        }
+    }
+
+    printf("Process\tArrival Time\tBurst Time\tWaiting Time\tTurnaround Time\n");
+    for (int i = 0; i < n; i++) {
+        printf("P%d\t\t%d\t\t%d\t\t%d\t\t%d\n", processes[i].pid, processes[i].arrival_time, processes[i].burst_time, processes[i].waiting_time, processes[i].turnaround_time);
+    }
+    printf("Average Waiting Time: %.2f\n", total_waiting_time/n);
+    printf("Average Turnaround Time: %.2f\n", total_turnaround_time/n);
+    return 0;
+}
+/*output 
+4
+2
+4
+6
+7
+2
+1
+0
+Process Arrival Time    Burst Time      Waiting Time    Turnaround Time
+P1              4               2               -4              -2
+P2              4               6               2               8
+P3              7               2               0               2
+P4              1               0               0               0
+Average Waiting Time: 0.00
+Average Turnaround Time: 4.00
+*/
