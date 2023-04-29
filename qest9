@@ -1,0 +1,56 @@
+#include <stdio.h>
+
+#define NUM_PROCESSES 3
+
+struct Process {
+    int id;
+    int burst_time;
+    int arrival_time;
+    int waiting_time;
+    int turnaround_time;
+};
+
+int main() {
+    struct Process processes[NUM_PROCESSES] = {
+        {0, 2, 0, 0, 0},
+        {1, 4, 0, 0, 0},
+        {2, 8, 0, 0, 0}
+    };
+
+    int current_time = 0;
+    float avg_waiting_time = 0.0;
+    float avg_turnaround_time = 0.0;
+
+    printf("Process\tBurst Time\tArrival Time\tWaiting Time\tTurnaround Time\n");
+
+    for (int i = 0; i < NUM_PROCESSES; i++) {
+        struct Process p = processes[i];
+
+        p.arrival_time = current_time;
+        p.waiting_time = current_time;
+        p.turnaround_time = p.waiting_time + p.burst_time;
+
+        current_time += p.burst_time;
+
+        avg_waiting_time += p.waiting_time;
+        avg_turnaround_time += p.turnaround_time;
+
+        printf("%d\t%d\t\t%d\t\t%d\t\t%d\n", p.id, p.burst_time, p.arrival_time, p.waiting_time, p.turnaround_time);
+    }
+
+    avg_waiting_time /= NUM_PROCESSES;
+    avg_turnaround_time /= NUM_PROCESSES;
+
+    printf("\nAverage Waiting Time: %.2f\n", avg_waiting_time);
+    printf("Average Turnaround Time: %.2f\n", avg_turnaround_time);
+
+    return 0;
+}
+/* output
+Process Burst Time      Arrival Time    Waiting Time    Turnaround Time
+0       2               0               0               2
+1       4               2               2               6
+2       8               6               6               14
+
+Average Waiting Time: 2.67
+Average Turnaround Time: 7.33 */
